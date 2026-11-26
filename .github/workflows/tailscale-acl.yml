@@ -1,0 +1,51 @@
+# Manage the Tailscale access control policy with GitOps:
+#   - Pull requests: test the policy only (syntax + the tests in the policy)
+#   - Push to main: apply to the tailnet after the tests pass
+#
+# To enable (see docs/acl-gitops.md):
+#   1. Create an OAuth client in the Tailscale admin console (with policy file write access)
+#   2. Add TS_OAUTH_ID, TS_OAUTH_SECRET and TS_TAILNET under repo Settings → Secrets
+#   3. Add TS_GITOPS_ENABLED = true under repo Settings → Variables
+# Without TS_GITOPS_ENABLED this workflow is skipped instead of failing.
+name: Tailscale ACL
+
+on:
+  push:
+    branches: [main]
+    paths: ["tailscale/policy.hujson"]
+  pull_request:
+    paths: ["tailscale/policy.hujson"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tailscale-acl
+  cancel-in-progress: false
+
+jobs:
+  acl:
+    if: vars.TS_GITOPS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test policy
+        uses: tailscale/gitops-acl-action@v1
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tailnet: ${{ secrets.TS_TAILNET }}
+          policy-file: tailscale/policy.hujson
+          action: test
+
+      - name: Apply policy
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: tailscale/gitops-acl-action@v1
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tailnet: ${{ secrets.TS_TAILNET }}
+          policy-file: tailscale/policy.hujson
+          action: apply
