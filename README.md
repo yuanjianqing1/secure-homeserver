@@ -1,6 +1,6 @@
 # secure-homeserver
 
-[![ShellCheck](https://github.com/<GITHUB_USER>/secure-homeserver/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/yuanjianqing1/secure-homeserver/actions/workflows/shellcheck.yml)
+[![ShellCheck](https://github.com/yuanjianqing1/secure-homeserver/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/yuanjianqing1/secure-homeserver/actions/workflows/shellcheck.yml)
 
 Turn a spare laptop into a Linux server that **exposes no ports to the public internet** yet can be managed securely from anywhere.
 
@@ -47,7 +47,7 @@ See [docs/architecture.md](docs/architecture.md) for details.
 On the server:
 
 ```bash
-git clone https://github.com/<GITHUB_USER>/secure-homeserver.git
+git clone https://github.com/yuanjianqing1/secure-homeserver.git
 cd secure-homeserver
 chmod +x scripts/*.sh
 
