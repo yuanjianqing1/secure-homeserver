@@ -1,0 +1,16 @@
+# Local environment and credentials: never commit
+.env
+*.env
+*.key
+*.pem
+*.ppk
+id_*
+!id_*.pub
+tskey-*
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
