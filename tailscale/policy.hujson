@@ -1,0 +1,36 @@
+// Tailscale access control policy (policy file), managed via GitOps by .github/workflows/tailscale-acl.yml.
+// Once automatic deployment is on, the policy in the admin console is overwritten by this file.
+// Replace the placeholders with real values before enabling it.
+{
+	// Only tailnet admins may assign tag:server.
+	// Tagged devices have key expiry disabled by default, which suits always-on servers.
+	"tagOwners": {
+		"tag:server": ["autogroup:admin"],
+	},
+
+	"grants": [
+		// Your own devices (laptop, phone, etc.) can reach each other.
+		{
+			"src": ["autogroup:member"],
+			"dst": ["autogroup:self"],
+			"ip":  ["*"],
+		},
+		// Only SSH and ping are allowed to the server; other ports are unreachable from the
+		// tailnet even if something listens on them.
+		{
+			"src": ["autogroup:member"],
+			"dst": ["tag:server"],
+			"ip":  ["tcp:22", "icmp:*"],
+		},
+	],
+
+	// Policy tests: verified on every push so a bad edit can't cut off access.
+	// Replace <YOUR_TAILSCALE_LOGIN> with your Tailscale login (e.g. your email).
+	"tests": [
+		{
+			"src":    "<YOUR_TAILSCALE_LOGIN>",
+			"accept": ["tag:server:22"],
+			"deny":   ["tag:server:80", "tag:server:3389"],
+		},
+	],
+}
